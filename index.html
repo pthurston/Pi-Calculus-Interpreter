@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<title>Pi Calculus Engine</title>
+<head><meta charset="utf-8"/></head>
+<body>
+	<script src="external\\lexer\\lexer.js"></script>
+	<script src="external\\PubSubJS\\src\\pubsub.js"></script>
+	<script src="tree.js"></script>
+	<script src="pi_interpreter.js"></script>
+	<header>Input</header>
+	<textarea id='code_input' rows="4" cols="50" placeholder="new(x).(x!z|x?y.y!x.x?y)|z?v.v!v"></textarea>
+	<button type='button' onclick="run();">Run</button>
+
+	<header>Output</header>
+	<textarea id='code_output' rows="10" cols="50"></textarea>
+
+	<script>
+		//document.getElementById('code_input').value = "new(x).(x!z|x?y.y!x.x?y)|z?v.v!v";
+		document.getElementById('code_input').value = "incr?a.incr?x.a!x|new(a).(incr!a.incr!x|a?y)";
+		document.getElementById('code_output').value = "";
+		function run(){
+			var rules = [
+				{p: /\./, name: "SEQ"},
+				{p: /\|/, name:"PAR"},
+				{p: /=/, name: "ASSIGNMENT"},
+				{p: /\?/, name: "READ"},
+				{p: /!/, name: "WRITE"},
+				{p: /new/, name: "NEW"},
+				{p: /[()]/, name: "PAREN"},
+				{p: /[A-Z]+[A-Z_]*/, name: "PROCID"},
+				{p: /[a-z]+[a-z_]*/, name: "VARID"},
+				{p: /$/, name: "EOF"}
+			];
+
+			var input = document.getElementById('code_input').value;
+			console.log(input);
+			var interpreter = new Pi_Interpreter(input, rules);
+			document.getElementById('code_output').value = interpreter.run();
+		}
+
+		/*
+		var subscriber = function(msg, data){
+			console.log(msg, data);
+		}
+		PubSub.publish('TOPIC', 'Hello World');
+		var token = PubSub.subscribe('TOPIC', subscriber);
+		PubSub.publishSync('TOPIC', 'Sync');
+		*/
+
+	</script>
+</body>
+</html>
