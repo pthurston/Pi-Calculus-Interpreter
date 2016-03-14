@@ -15,15 +15,40 @@
 		<script src="interpreter.js"></script>
 </head>
 <body>
+	<h1>Pi Calculus Interpreter</h1>
+	<div class = 'horizontal_div'>
+		<div>
+			<header>Syntax</header>
+			<ol>
+					<li>a!b: Write b to channel a</li>
+					<li>a?b: Read b from channel a</li>
+					<li>new(a): Create new channel a</li>
+					<li>P = a?b: Create new process P</li>
+			</ol>
+		</div>
+		<div>
+			<header>Notes</header>
+			<ol>
+				<li>Variables and channel names must be all lowercase</li>
+				<li>Process names must be all uppercase</li>
+				<li>To write any variable to the print channel (print!a) to generate output</li>
+				<li>A line cannot start with a Process name unless you are assigning to it</li>
+				<ul><li>Try using (CLIENT|SERVER) instead of CLIENT|SERVER
+			</ol>
+		</div>
+	</div>
+	
+	<div style='clear:both'>
 	<header>Input</header>
 	<textarea id='code_input' rows="4" cols="50" placeholder="new(x).(x!z|x?y.y!x.x?y)|z?v.v!v"></textarea>
 	<button type='button' onclick="run();">Run</button>
+	</div>
 	<div class='horizontal_div'>
 			<button type='button' onclick="printer();">Printer</button>
 			<button type='button' onclick="identity();">Identity</button>
 			<button type='button' onclick="basic();">Basic</button>
 	</div>
-	<div class='horizontal_div'>
+	<div class = 'horizontal_div'>
 			<div>
 					<header>Output</header>
 					<textarea id='code_output' rows="10" cols="25"></textarea>
