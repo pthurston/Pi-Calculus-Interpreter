@@ -21,41 +21,69 @@ Queue.prototype.dequeue = function(data){
 	return deletedData;
 }
 
-function Node(data){
+function Tree(data){
 	this.data = data;
-
-	this.parent = null;
 	this.children = [];
+	this.parent = null;
+	for(var i = 1; i < arguments.length; i++){
+		this.children.push(arguments[i])
+		arguments[i].parent = this;
+	}
 }
 
-Node.prototype.addChild = function(n) {
+Tree.prototype.addChild = function(n) {
 	if(n == undefined)
 		return;
 	this.children[this.children.length] = n;
 	n.parent = this;
 };
 
-Node.prototype.removeChild = function(n){
+Tree.prototype.removeChild = function(n){
 	var i = this.children.indexOf(n);
 	if(i > -1)
 		this.children.splice(i, 1);
+	n.parent = null;
 };
 
-Node.prototype.collapse = function(){
-	if(this.parent == null)
+Tree.prototype.replaceWith = function(n) {
+	var i = this.parent.children.indexOf(this);
+	n.parent = this.parent;
+	this.parent.children[i] = n;
+};
+
+Tree.prototype.removeFromParent = function() {
+	var parent = this.parent;
+	if(parent == null)
+		return
+	parent.removeChild(this);
+};
+
+Tree.prototype.collapse = function(){
+	if(this.children.length == 0)
 		return;
-	if(this.children.length == 1){
-		var i = this.parent.children.indexOf(this);
-		var newchild = this.children[0];
-		this.parent.children[i] = newchild;
-		newchild.parent = this.parent;
-		if(newchild.data == newchild.parent.data){
-			newchild.parent.removeChild(newchild);
-			newchild.parent.children = newchild.children.concat(newchild.parent.children);
-			for(var i = 0; i < newchild.children.length; i++)
-				newchild.children[i].parent = newchild.parent;
+	if(this.data == "PAR" || this.data == "SEQ"){
+		if(this.children.length == 1){
+			var parent = this.parent;
+			this.data = this.children[0].data;
+			this.children = this.children[0].children;
+			for(var i in this.children)
+				this.children[i].parent = this;
 		}
 	}
+	for(var i in this.children){
+		//this.children[i].parent = this;
+		this.children[i].collapse();
+	}
+}
+
+Tree.prototype.printInOrder = function() {
+	var str = '';
+	for(var i = 0; i < this.children.length; i++){
+		str += this.children[i].printInOrder();
+		str += this.data;
+	}
+	//str += this.children[this.children.length-1].printInOrder();
+	return str;
 }
 
 Node.prototype.applySub = function(sub_from, sub_to){
@@ -111,8 +139,8 @@ Node.prototype.traverseSyntaxTree = function(callback){
 	})(this);
 }
 
-Node.prototype.copyTree = function(){
-	var node = new Node(this.data);
+Tree.prototype.copyTree = function(){
+	var node = new Tree(this.data);
 	for(var i = 0; i < this.children.length; i++){
 		node.addChild(this.children[i].copyTree());
 	}
@@ -133,8 +161,4 @@ Node.prototype.printInOrder = function(){
 		str += recurse(n.children[n.children.length-1]);
 		return str;
 	})(this);
-}
-
-function Tree(data){
-	this._root = new Node(data);
 }

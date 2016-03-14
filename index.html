@@ -1,20 +1,81 @@
 <!DOCTYPE html>
 <html>
 <title>Pi Calculus Engine</title>
-<head><meta charset="utf-8"/></head>
+<head>
+		<meta charset="utf-8"/>
+		<style>
+		.horizontal_div div{
+			float: left;
+		}
+		</style>
+		<script src="external\\lexer\\lexer.js"></script>
+		<script src="external\\PubSubJS-1.5.3\\src\\pubsub.js"></script>
+		<script src="tree.js"></script>
+		<!--<script src="pi_interpreter.js"></script>-->
+		<script src="parser.js"></script>
+		<script src="interpreter.js"></script>
+</head>
 <body>
-	<script src="external\\lexer\\lexer.js"></script>
-	<script src="external\\PubSubJS\\src\\pubsub.js"></script>
-	<script src="tree.js"></script>
-	<script src="pi_interpreter.js"></script>
 	<header>Input</header>
 	<textarea id='code_input' rows="4" cols="50" placeholder="new(x).(x!z|x?y.y!x.x?y)|z?v.v!v"></textarea>
 	<button type='button' onclick="run();">Run</button>
-
-	<header>Output</header>
-	<textarea id='code_output' rows="10" cols="50"></textarea>
-
+	<div class='horizontal_div'>
+			<button type='button' onclick="printer();">Printer</button>
+			<button type='button' onclick="identity();">Identity</button>
+			<button type='button' onclick="basic();">Basic</button>
+	</div>
+	<div class='horizontal_div'>
+			<div>
+					<header>Output</header>
+					<textarea id='code_output' rows="10" cols="25"></textarea>
+			</div>
+			<div>
+					<header>Debug</header>
+					<textarea id='code_debug' rows="10" cols="25"></textarea>
+			</div>
+	</div>
 	<script>
+	function run(){
+		interpreter = new PI_Interpreter();
+		interpreter.loadInput(document.getElementById('code_input').value);
+		
+		document.getElementById('code_output').value = '';
+		document.getElementById('code_debug').value = '';
+	
+		interpreter.run(function(line){
+			document.getElementById('code_output').value += line + '\n';
+		},  function(line){
+			document.getElementById('code_debug').value += line + '\n';
+		});
+	}
+
+	function printer(){
+		var input = "PRINTER = b?doc.print!doc.PRINTER\n" + 
+					"SERVER = a!b.SERVER\n" +
+					"CLIENT = a?p.p!d.CLIENT\n" +
+					"new(a).new(b).(CLIENT|SERVER|PRINTER)"
+		document.getElementById('code_input').value = input;
+	}
+
+	function identity(){
+		var input = "id?b.id?x.b!x|new(a).id!a.id!17|a?y.print!y";
+		document.getElementById('code_input').value = input;
+	}
+
+	function basic(){
+		var input = "new(x).(x!z|x?y.y!x.x?y)|z?v.v!v.print!v";
+		document.getElementById('code_input').value = input;
+	}
+
+
+/*
+	if(subscriptions['c'] != undefined)
+		PubSub.unsubscribe(subscriptions['c']);
+	subscriptions['c'] = PubSub.subscribe('c', receive);
+	
+		*/
+	</script>
+	<!--<script>
 		//document.getElementById('code_input').value = "new(x).(x!z|x?y.y!x.x?y)|z?v.v!v";
 		document.getElementById('code_input').value = "incr?a.incr?x.a!x|new(a).(incr!a.incr!x|a?y)";
 		document.getElementById('code_output').value = "";
@@ -47,6 +108,6 @@
 		PubSub.publishSync('TOPIC', 'Sync');
 		*/
 
-	</script>
+	</script>-->
 </body>
 </html>
